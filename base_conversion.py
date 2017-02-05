@@ -27,7 +27,7 @@ def dec_to_other(number, base):
     fin.append(leftover1)
     leftover2 = div % base
 ##    print 'div =', div, 'leftover =', leftover2
-    if leftover2 > 0:
+    if div != 0:
         fin.append(leftover2)
     while div >= base:
         div = div /base
