@@ -95,10 +95,11 @@ def validBases(bases):
             elif int(base) <2 or int(base) > 36:
                 print 'Invalid input. Bases must be 2-36'
                 return False
-    else: # if input not in format: baseA,baseB
+    else: # for instance, if input not in format: baseA,baseB
         print 'Invalid input. Must input two bases with values in range 2-36 '\
               +'and in the format: x,y where x is the base of the value you '\
               +'wish to input and y is the base you wish to convert to.'
+        return False
     return True
 
 
