@@ -85,62 +85,84 @@ def validInput(value, baseA):
     return True      
 
 
-def whatBases():
-    # User selects initial and final base. Validity testing included.
+def validBases(bases):
+    # Validity testing for user selected initial and final base.
+    if len(bases) == 2:
+        for i, base in enumerate(bases):
+            if not base.isdigit():
+                print 'Invalid input. Bases must be 2-36 and in format: baseA,baseB.'
+                return False
+            elif int(base) <2 or int(base) > 36:
+                print 'Invalid input. Bases must be 2-36'
+                return False
+    else: # if input not in format: baseA,baseB
+        print 'Invalid input. Must input two bases with values in range 2-36 '\
+              +'and in the format: x,y where x is the base of the value you '\
+              +'wish to input and y is the base you wish to convert to.'
+    return True
+
+
+def querry(Type, baseA = None):
+    # Handles all querries
     while True:
-        msg1 = 'What base do you want to convert from and what base do you want to convert to? (e.g. to convert from decimal to binary, type: 10,2):'
-        in1 = raw_input(msg1)
-        bases = in1.split(',')
-##        print '1bases =', bases
-        if len(bases) == 2:
-            for i, base in enumerate(bases):
-                if not base.isdigit():
-                    print 'Invalid input. Bases must be 2-36 and in format: baseA,baseB.'
-                    break
-                elif int(base) <2 or int(base) > 36:
-                    print 'Invalid input. Bases must be 2-36'
-                    break
-                elif i == 1:
-                    return bases
-        else: # if input not in format: baseA,baseB
-            print 'Invalid input. Must input two bases with values in range 2-36 '\
-                  +'and in the format: x,y where x is the base of the value you '\
-                  +'wish to input and y is the base you wish to convert to.'
+        msg1 = 'Input bases (baseA,baseB):'
+        msg2 = '\nInput value to convert:'
+        if Type == 'bases':
+            value = raw_input(msg1)
+            if value == '@help':
+                Help()
+            elif value == '@quit':
+                quit()
+            else:
+                bases = value.split(',')
+                if validBases(bases):
+                    intbases = [int(x) for x in bases]
+                    return intbases
+        else:
+            value = raw_input(msg2)
+            if value == '@help':
+                Help()
+            elif value == '@diff':
+                return value
+            elif value == '@quit':
+                quit()
+            elif validInput(value, baseA):
+                return value
 
+
+def Help():
+    # Some potentially helpful info
+    print '\n' + '*'*40 + '\nWelcome to the help doc for Base Conversion.'
+    print 'For information on how to use this tool, type "how".'
+    print 'To see the intro again, type "intro".'
+    print 'For a reminder of all commands, type "commands".'
+    print 'To exit help, type "exit".'
+    while True:
+        stuff = raw_input().lower()
+        if stuff == 'exit':
+            print '*'*40 + '\n'
+            break
+        elif stuff == 'how':
+            print 'To convert a number, first input the bases you want to '\
+                  +'convert from (baseA) and to (baseB) in the form: baseA,baseB.'\
+                  +' Then simply input the number to convert, when prompted.\n'\
+                  +'Once base settings are set, they are maintained untill changed.'\
+                  +' You can change them by typing "@diff".'
+        elif stuff == 'commands':
+            print '"@help" to get back to help.\n' +\
+                  '"@diff" to change base conversion settings.\n' +\
+                  '"@quit" to quit.'
+        elif stuff == 'intro':
+            print intro
             
-def querry(baseA):
-    # Where user inputs value to convert. Uses seperate func for valitity testing.
-    msg2 = '\nInput value to convert:'
-    number = raw_input(msg2).lower()
-    if number == 'diff': # Indicates user wants to change settings.
-        return 'diff'
-    elif validInput(number, baseA):
-        return number
-
-    
-def continue1():
-    # Checks if user wants to continue at all.
-    msg = "Do you want to go again? (y, n, or quit):"
-    blarg = raw_input(msg)
-    if blarg == 'quit':
-        quit()
-    return blarg
-
-
-def continue2():
-    # Further checks if user wants to continue doing calculations with same settings.
-    msg = '\nDo you want to keep doing conversions with the same bases? '\
-          +"If so, type 'same', and you can continue with these settings "\
-          +" without interuption, until you type 'diff'."
-    blarg = raw_input(msg)
-    return blarg
-
 
 def mainish(number, baseA, baseB):
-    # Determines what combinations of the two main functions to use depending on
+    # Determines what combination of the two main functions to use depending on
     # user input, and implements them to get an answer.
     if baseA == 10:
         part2 = dec_to_other(int(number), baseB)
+    elif baseB == 10:
+        part2 = other_to_dec(number, baseA)
     else:
         part1 = other_to_dec(number, baseA)
         part2 = dec_to_other(part1, baseB)
@@ -149,40 +171,31 @@ def mainish(number, baseA, baseB):
 
 ##############################
 # Calling the functions
-# This part could certainly be improved if it ever seems like it's worth it...
 
 
 intro = 'Welcome to numeric base conversion, which converts between any two '\
-       +'bases in the range 2-36 (binary to hexadecimal), using the characters '\
-       +'0-9 and a-f. Supports positive whole numbers only.\n'
-
+       +'bases in the range 2-36 (binary to hexatrigesimal), using the characters '\
+       +'0-9 and a-z. Supports positive whole numbers only. \nType "@help" at any '\
+       +'time for the help doc.\n'
+global intro
 print intro
 
-number = 'diff'
-alnums = makeAlnums() # Or could call this later, only if base>10...
+number = '@diff'
+alnums = makeAlnums() 
 while True:
     if number == 'same':
-        while True:# number != 'diff':
-            number = querry(baseA)
-            if number == 'diff':
+        while True:
+            number = querry('other', baseA)
+            if number == '@diff' or not number:
                 break
             else:
-                if number:
-                    answer = mainish(number, baseA, baseB)
-                    print '\nBase', str(baseA) + ':', number, '= Base', str(baseB) + ':', answer 
-    bases = whatBases()
-    baseA = int(bases[0])
-    baseB = int(bases[1])
-    number = querry(baseA)
+                answer = mainish(number, baseA, baseB)
+                print '\nBase', str(baseA) + ':', number, '= Base', str(baseB) + ':', answer
+    baseA, baseB = querry('bases')
+    number = querry('other', baseA)
     if number:
         answer = mainish(number, baseA, baseB)
         print '\nBase', str(baseA) + ':', number, '= Base', str(baseB) + ':', answer, '\n'
+        number = 'same'
     else:
-        number = 'diff'
-    blarg = continue1()
-    if blarg.lower().startswith('y'):
-        number = continue2()
-    else:
-        print '\nWelcome to my idea of testing mode. If you want to know what '\
-              +'funtions there are to play around with......read the code ^_^'
-        break
+        number = '@diff'
